@@ -1,17 +1,27 @@
-# Template Python on Docker
+# Get Youtube live comment
 
-## 使い方
+YoutubeのLive中のコメントを取得する。
 
-1. Dockerfileのimageを変更する。
-2. 必要に応じてDockerfileにpipを書く。
-3. 必要に応じてdocker-compose.ymlを修正する。
-4. 下記実行。
-    ``` sh
-    docker-compose build
-    docker-compose up
-    ```
+## 準備
 
-## 参考
+app/.envファイルを作成する。
 
-- [Qiita:Docker を使う（python のイメージで色々確認してみる）](https://qiita.com/landwarrior/items/fd918da9ebae20486b81)
-- [Future Tech Blog:仕事でPythonコンテナをデプロイする人向けのDockerfile (1): オールマイティ編](https://future-architect.github.io/articles/20200513/)
+``` env
+# [Youtube]
+YoutubeAPIKey=<APIキー>
+LiveID=<取得したい配信のID>
+```
+
+## 実行
+
+``` sh
+docker-compose up
+```
+
+## 実行結果
+
+```app/oputput```配下に```comments_${実行時_年月日_時分秒}.json```ファイルが作成される。
+
+## 備考
+
+絵文字がうまく取得できない。
