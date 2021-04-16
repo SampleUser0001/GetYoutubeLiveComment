@@ -51,23 +51,38 @@ def getLiveComments(liveChatId):
         print('Cannot get live comments.')
         return None
 
-# コメント取得。
-liveComments = getLiveComments(getActiveLiveChatID())
+def writeLiveComments(liveComments):
+    """ 取得したLiveのコメントをファイルに書き込む。
+    書き込んだファイルのファイルパスを返す。
+    ファイルパスはapp/comments_${LiveID}_%Y%m%d_%H%M%S.json
+    引数がNoneの場合、何もせずにNoneを返す。
+    """
+    json_file_path = None
+    
+    if liveComments is not None:
+        # コメントが取得できた場合、ファイルに書き込む。
+    
+        # 書き込みファイルのファイル名を生成する。
+        DATE_FORMAT='%Y%m%d_%H%M%S'
+        JST = timezone(timedelta(hours=+9), 'JST')
+        now = datetime.now(JST).strftime(DATE_FORMAT)
+        COMMENTS_FILE='output/comments_' + settings.ENV_DIC[ENV_KEY_LIVE_ID] + '_' + now + '.json'
+    
+        json_file_path = 'app/' + COMMENTS_FILE
+    
+        # エンコード回避しないならencodingの記載は不要
+        with open(COMMENTS_FILE, mode='w', encoding='utf-8') as f:
+            # エンコード回避
+            f.write(json.dumps(liveComments, ensure_ascii=False))
+    
+    return json_file_path
 
-if liveComments is not None:
-    # コメントが取得できた場合、ファイルに書き込む。
-
-    # 書き込みファイルのファイル名を生成する。
-    DATE_FORMAT='%Y%m%d_%H%M%S'
-    JST = timezone(timedelta(hours=+9), 'JST')
-    now = datetime.now(JST).strftime(DATE_FORMAT)
-    COMMENTS_FILE='output/comments_' + now + '.json'
-
-    # コメント出力先ファイルパスを標準出力する。…え？書き方がダサい？
-    print('filename:', 'app/' + COMMENTS_FILE)
-
-    # エンコード回避しないならencodingの記載は不要
-    with open(COMMENTS_FILE, mode='w', encoding='utf-8') as f:
-        # エンコード回避
-        f.write(json.dumps(liveComments, ensure_ascii=False))
-
+if __name__ == '__main__':
+    # コメント取得。
+    liveComments = getLiveComments(getActiveLiveChatID())
+    
+    # ファイル書き込み
+    json_file_path = writeLiveComments(liveComments)
+    
+    # コメント出力先ファイルパスを標準出力する。
+    print('filename:', json_file_path)
