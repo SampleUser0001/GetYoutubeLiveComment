@@ -4,6 +4,7 @@ import settings
 import requests
 import locale
 import json
+import time
 
 # 動画情報を取得するAPI。ActiveLiveChatIDを取得するために使う。
 VIDEO_API_URL='https://www.googleapis.com/youtube/v3/videos'
@@ -78,11 +79,16 @@ def writeLiveComments(liveComments):
     return json_file_path
 
 if __name__ == '__main__':
-    # コメント取得。
-    liveComments = getLiveComments(getActiveLiveChatID())
-    
-    # ファイル書き込み
-    json_file_path = writeLiveComments(liveComments)
-    
-    # コメント出力先ファイルパスを標準出力する。
-    print('filename:', json_file_path)
+    while True:
+        # コメント取得。
+        liveComments = getLiveComments(getActiveLiveChatID())
+        
+        # ファイル書き込み
+        json_file_path = writeLiveComments(liveComments)
+
+        # コメント出力先ファイルパスを標準出力する。
+        print('filename:', json_file_path , flush=True)
+        sleeptime = float(liveComments['pollingIntervalMillis'])
+        time.sleep(sleeptime/1000)
+
+
