@@ -12,6 +12,17 @@ YoutubeAPIKey=<APIキー>
 LiveID=<取得したい配信のID>
 ```
 
+### YoutubeAPIKeyの確認
+
+取得済みの想定で…確認方法を忘れがちなのでメモ。
+
+1. GoogleCloudPlatform
+2. 対象プロジェクト
+3. 左上のハンバーガーメニュー
+4. APIとサービス
+5. 認証情報
+6. APIキー
+
 ## 実行
 
 ``` sh
