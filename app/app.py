@@ -5,6 +5,7 @@ import requests
 import locale
 import json
 import time
+import os
 
 # 動画情報を取得するAPI。ActiveLiveChatIDを取得するために使う。
 VIDEO_API_URL='https://www.googleapis.com/youtube/v3/videos'
@@ -20,6 +21,8 @@ keyIndex = 0
 ENV_KEY_YOUTUBE_KEY = settings.ENV_KEYS[keyIndex]; keyIndex = keyIndex + 1;
 ENV_KEY_LIVE_ID = settings.ENV_KEYS[keyIndex]; keyIndex = keyIndex + 1;
 
+# ファイルの出力ディレクトリ(コンテナ内)
+CONTAINER_OUTPUT_DIR = 'output/' + settings.ENV_DIC[ENV_KEY_LIVE_ID]
 
 def getActiveLiveChatID():
     """ ActiveLiveChatIDを取得する関数。
@@ -71,8 +74,9 @@ def writeLiveComments(liveComments):
         DATE_FORMAT='%Y%m%d_%H%M%S'
         JST = timezone(timedelta(hours=+9), 'JST')
         now = datetime.now(JST).strftime(DATE_FORMAT)
-        COMMENTS_FILE='output/comments_' + settings.ENV_DIC[ENV_KEY_LIVE_ID] + '_' + now + '.json'
+        COMMENTS_FILE = CONTAINER_OUTPUT_DIR + '/comments_' + settings.ENV_DIC[ENV_KEY_LIVE_ID] + '_' + now + '.json'
     
+        # コンテナの外から見えるパス
         json_file_path = 'app/' + COMMENTS_FILE
     
         # エンコード回避しないならencodingの記載は不要
@@ -83,6 +87,10 @@ def writeLiveComments(liveComments):
     return json_file_path
 
 if __name__ == '__main__':
+    # 出力先ディレクトリ作成
+    if not os.path.isdir(CONTAINER_OUTPUT_DIR):
+        os.makedirs(CONTAINER_OUTPUT_DIR)
+
     live_chat_id = getActiveLiveChatID()
     if live_chat_id is not None:
         while True:
@@ -95,9 +103,9 @@ if __name__ == '__main__':
             # コメント出力先ファイルパスを標準出力する。
             print('filename:', json_file_path , flush=True)
             try:
-#                sleeptime = float(liveComments[KEY_POLLING_INTERVAL_MILLIS])
-                sleeptime = 8000
+                sleeptime = float(liveComments[KEY_POLLING_INTERVAL_MILLIS])
+                # 場合によってはこのくらいでも平気。
+                # sleeptime = 8000
             except TypeError:
                 print("{} is not found.".format(KEY_POLLING_INTERVAL_MILLIS))
-#                sleeptime = float(4500)
             time.sleep(sleeptime/1000)
