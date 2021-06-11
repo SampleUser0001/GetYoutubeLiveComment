@@ -12,6 +12,9 @@ VIDEO_API_URL='https://www.googleapis.com/youtube/v3/videos'
 # コメントを取得するAPI。
 LIVE_CHAT_API_URL='https://www.googleapis.com/youtube/v3/liveChat/messages'
 
+# 待ち時間取得キー
+KEY_POLLING_INTERVAL_MILLIS='pollingIntervalMillis'
+
 # envのキーを読み込む。
 keyIndex = 0
 ENV_KEY_YOUTUBE_KEY = settings.ENV_KEYS[keyIndex]; keyIndex = keyIndex + 1;
@@ -33,6 +36,7 @@ def getActiveLiveChatID():
         return result['items'][0]['liveStreamingDetails'][KEY]
     else:
         print(KEY, 'is None')
+        print(result)
         return None
 
 def getLiveComments(liveChatId):
@@ -79,16 +83,21 @@ def writeLiveComments(liveComments):
     return json_file_path
 
 if __name__ == '__main__':
-    while True:
-        # コメント取得。
-        liveComments = getLiveComments(getActiveLiveChatID())
-        
-        # ファイル書き込み
-        json_file_path = writeLiveComments(liveComments)
+    live_chat_id = getActiveLiveChatID()
+    if live_chat_id is not None:
+        while True:
+            # コメント取得。
+            liveComments = getLiveComments(live_chat_id)
+            
+            # ファイル書き込み
+            json_file_path = writeLiveComments(liveComments)
 
-        # コメント出力先ファイルパスを標準出力する。
-        print('filename:', json_file_path , flush=True)
-        sleeptime = float(liveComments['pollingIntervalMillis'])
-        time.sleep(sleeptime/1000)
-
-
+            # コメント出力先ファイルパスを標準出力する。
+            print('filename:', json_file_path , flush=True)
+            try:
+#                sleeptime = float(liveComments[KEY_POLLING_INTERVAL_MILLIS])
+                sleeptime = 8000
+            except TypeError:
+                print("{} is not found.".format(KEY_POLLING_INTERVAL_MILLIS))
+#                sleeptime = float(4500)
+            time.sleep(sleeptime/1000)
