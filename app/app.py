@@ -54,7 +54,18 @@ def getLiveComments(liveChatId):
             'liveChatId':liveChatId,
             'part':'id,snippet,authorDetails'
         }
-        return requests.get(LIVE_CHAT_API_URL, params=params).json()
+
+        # コメント取得
+        comments = requests.get(LIVE_CHAT_API_URL, params=params).json()
+
+        # エラーチェック
+        if 'error' in comments.keys():
+            print('code:{}'.format(comments['code']))
+            print('message:{}'.format(comments['message']))
+            print('reason:{}'.format(comments['errors'][0]['reason']))
+            return None
+        else:
+            return comments
     else:
         print('Cannot get live comments.')
         return None
@@ -96,16 +107,19 @@ if __name__ == '__main__':
         while True:
             # コメント取得。
             liveComments = getLiveComments(live_chat_id)
-            
-            # ファイル書き込み
-            json_file_path = writeLiveComments(liveComments)
+            if liveComments is None:
+                # コメントが取得できなくなったら終了。
+                break
+            else:
+                # ファイル書き込み
+                json_file_path = writeLiveComments(liveComments)
 
-            # コメント出力先ファイルパスを標準出力する。
-            print('filename:', json_file_path , flush=True)
-            try:
-                sleeptime = float(liveComments[KEY_POLLING_INTERVAL_MILLIS])
-                # 場合によってはこのくらいでも平気。
-                # sleeptime = 8000
-            except TypeError:
-                print("{} is not found.".format(KEY_POLLING_INTERVAL_MILLIS))
-            time.sleep(sleeptime/1000)
+                # コメント出力先ファイルパスを標準出力する。
+                print('filename:', json_file_path , flush=True)
+                try:
+                    # sleeptime = float(liveComments[KEY_POLLING_INTERVAL_MILLIS])
+                    # 場合によってはこのくらいでも平気。
+                    sleeptime = 8000
+                except TypeError:
+                    print("{} is not found.".format(KEY_POLLING_INTERVAL_MILLIS))
+                time.sleep(sleeptime/1000)
