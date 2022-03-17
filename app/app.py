@@ -60,9 +60,7 @@ def getLiveComments(liveChatId):
 
         # エラーチェック
         if 'error' in comments.keys():
-            print('code:{}'.format(comments['code']))
-            print('message:{}'.format(comments['message']))
-            print('reason:{}'.format(comments['errors'][0]['reason']))
+            print('error : {}'.fromat(comments))
             return None
         else:
             return comments
