@@ -9,7 +9,6 @@ app/.envファイルを作成する。
 ``` env
 # [Youtube]
 YoutubeAPIKey=<APIキー>
-LiveID=<取得したい配信のID>
 ```
 
 ### YoutubeAPIKeyの確認
@@ -26,7 +25,8 @@ LiveID=<取得したい配信のID>
 ## 実行
 
 ``` sh
-docker-compose up
+export LIVE_ID=${動画ID}
+docker-compose run -e LiveID=${LIVE_ID} --rm python
 ```
 
 ## 実行結果
